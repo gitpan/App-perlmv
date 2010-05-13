@@ -1,6 +1,6 @@
 package App::perlmv::scriptlets::std;
 BEGIN {
-  $App::perlmv::scriptlets::std::VERSION = '0.24';
+  $App::perlmv::scriptlets::std::VERSION = '0.25';
 }
 
 our %scriptlets = (
@@ -61,7 +61,7 @@ App::perlmv::scriptlets::std
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHOR
 

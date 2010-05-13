@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# ABSTRACT: Rename files using Perl code.
 
 use strict;
 use warnings;
@@ -8,7 +7,7 @@ use File::Spec;
 use Getopt::Std;
 use Cwd qw(abs_path getcwd);
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 our $HOMEDIR;
 if ($ENV{TESTING_HOME}) { $HOMEDIR = $ENV{TESTING_HOME} }
@@ -17,6 +16,8 @@ else {
     if (!$HOMEDIR) { $HOMEDIR = $ENV{HOME} }
     die "FATAL: Can't determine home directory\n" unless $HOMEDIR;
 }
+
+my $scriptlets;
 
 my %opts;
 getopts('ce:D:dfhLorS:VvW:', \%opts);
@@ -57,16 +58,19 @@ Options:
 USAGE
 
 if ($opts{L}) {
-    my $s = find_scriptlets();
-    print $_, "\n" for keys %$s;
+    load_scriptlets();
+    for (sort keys %$scriptlets) {
+        if ($opts{v}) {
+            print format_scriptlet_source($_), "\n";
+        } else {
+            print $_, "\n";
+        }
+    }
     exit 0;
 }
 
 if ($opts{S}) {
-    my $s = find_scriptlets();
-    die "FATAL: Scriptlet `$opts{S}` not found\n" unless $s->{$opts{S}};
-    print "# Scriptlet: $opts{S} (from ", $s->{$opts{S}}{from}, ")\n";
-    print $s->{$opts{S}}{code}, "\n";
+    print format_scriptlet_source($opts{S});
     exit 0;
 }
 
@@ -76,7 +80,7 @@ if ($opts{W}) {
 }
 
 if ($opts{D}) {
-    delete_scriptlet($opts{D});
+    delete_user_scriptlet($opts{D});
     exit 0;
 }
 
@@ -88,9 +92,7 @@ if ($opts{e}) {
     die "FATAL: Must specify -e or scriptlet name in first argument\n"
         unless @ARGV;
     $name = shift @ARGV;
-    my $s = find_scriptlets();
-    $s->{$name} or die "FATAL: Can't find scriptlet `$name`\n";
-    $code = $s->{$name}{code};
+    $code = load_scriptlet($name);
 }
 
 $opts{v} = 1 if $opts{d};
@@ -114,6 +116,32 @@ if ($^O =~ /win32/i) {
 
 my %n = ();
 process_items(@items);
+
+# subroutines
+
+sub format_scriptlet_source {
+    my ($name) = @_;
+    load_scriptlets();
+    die "FATAL: Scriptlet `$opts{S}` not found\n"
+        unless $scriptlets->{$name};
+    "# Scriptlet: $name (from ", $scriptlets->{$name}{from}, ")\n" .
+    $scriptlets->{$name}{code} .
+    ($scriptlets->{$name}{code} =~ /\n\z/ ? "" : "\n");
+}
+
+sub load_scriptlet {
+    my ($name) = @_;
+    load_scriptlets();
+    die "FATAL: Can't find scriptlet `$name`"
+        unless $scriptlets->{$name};
+    $scriptlets->{$name}{code};
+}
+
+sub load_scriptlets {
+    if (!$scriptlets) {
+        $scriptlets = find_scriptlets();
+    }
+}
 
 sub find_scriptlets {
     my $res = {};
@@ -182,7 +210,7 @@ sub write_scriptlet {
         die "FATAL: Can't write to $HOMEDIR/.perlmv/scriptlets/$name: $!\n";
 }
 
-sub delete_scriptlet {
+sub delete_user_scriptlet {
     my ($name) = @_;
     unlink "$HOMEDIR/.perlmv/scriptlets/$name";
 }
@@ -254,6 +282,14 @@ sub process_item {
 
 1;
 __END__
+
+=head1 NAME
+
+perlmv - Rename files using Perl code
+
+=head1 VERSION
+
+0.25
 
 =head1 SYNOPSIS
 
@@ -349,10 +385,21 @@ L<App::perlmv::scriptlets::std>.
  -W <NAME> Write code specified in -e as scriptlet
  -D <NAME> Delete scriptlet
 
-=head1 HISTORY
+=head1 FAQ
 
-I wrote C<perlrename> 0.01 back in 2003 and have been using it
-daily. In 2010 I uploaded version 0.24 as C<perlmv> to CPAN, with
-ability to store & read scriptlets.
+=head2 Why should I use perlmv? There is prename already?
+
+Yes, there is a very similar script called B<prename> (also accessible
+via B<rename> in Debian) which comes with Perl. This script reinvents
+prename and offers more features, e.g.: automatic renaming in case of
+conflicts, recursive mode, and saving and loading scriptlets.
+
+=head1 BUGS/TODOS
+
+Patches for Windows welcome.
+
+=head1 SEE ALSO
+
+L<prename>.
 
 =cut

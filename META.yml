@@ -14,4 +14,7 @@ meta-spec:
 name: App-perlmv
 recommends: {}
 requires: {}
-version: 0.24
+resources:
+  homepage: http://search.cpan.org/dist/App-perlmv/
+  repository: http://github.com/sharyanto/perlmv
+version: 0.25
