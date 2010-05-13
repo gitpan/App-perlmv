@@ -1,25 +1,36 @@
 package App::perlmv::scriptlets::std;
 BEGIN {
-  $App::perlmv::scriptlets::std::VERSION = '0.25';
+  $App::perlmv::scriptlets::std::VERSION = '0.26';
 }
 
 our %scriptlets = (
 
 
-    'lc' => "# Convert filenames to lowercase\n" . q[$_ = lc],
+
+    'lc' => "### Summary: Convert filenames to lowercase\n" . q[$_ = lc],
 
 
-    'uc' => "# Convert filenames to uppercase\n" . q[$_ = uc],
+
+    'uc' => "### Summary: Convert filenames to uppercase\n" . q[$_ = uc],
 
 
-    'with-numbers' => "# Rename files into numbers, e.g. (file1, foo, quux, qux) -> (1, 2, 3, 4)\n".
+
+    'to-number-ext' => "### Summary: Rename files into numbers. Preserve extensions. Ex: (file1.txt, foo.jpg, quux.mpg) -> (1.txt, 2.jpg, 3.mpg)\n".
 q{$i||=0; $i++ unless $TESTING;
 /.+\.(.+)/; $ext=$1;
 $ndig = @ARGV >= 1000 ? 4 : @ARGV >= 100 ? 3 : @ARGV >= 10 ? 2 : 1;
-$_ = sprintf "%0${ndig}d%s", $i, (defined($ext) ? ".$ext" : "");'},
+$_ = sprintf "%0${ndig}d%s", $i, (defined($ext) ? ".$ext" : "")},
 
 
-    'remove-common-prefix' => "# Remove prefix that are common to all args, e.g. (file1, file2b) -> (1, 2b)\n".
+
+    'to-timestamp-ext' => "### Summary: Rename files into timestamp. Preserve extensions. Ex: file1.txt -> 2010-05-13-10_43_49.txt\n".
+q{use POSIX; /.+\.(.+)/; $ext=$1;
+@st = lstat $_;
+$_ = POSIX::strftime("%Y-%m-%d-%H_%M_%S", localtime $st[9]).(defined($ext) ? ".$ext" : "")},
+
+
+
+    'remove-common-prefix' => "### Summary: Remove prefix that are common to all args, e.g. (file1, file2b) -> (1, 2b)\n".
 q{
 if (!defined($COMMON_PREFIX)) {
     for ($i=0; $i<length($ARGV[0]); $i++) {
@@ -30,7 +41,8 @@ if (!defined($COMMON_PREFIX)) {
 s/^\Q$COMMON_PREFIX//;},
 
 
-    'remove-common-suffix' => "# Remove suffix that are common to all args, e.g. (1.txt, a.txt) -> (1, a)\n".
+
+    'remove-common-suffix' => "### Summary: Remove suffix that are common to all args, e.g. (1.txt, a.txt) -> (1, a)\n".
 q{if (!defined($COMMON_SUFFIX)) {
     for (@ARGV) { $_ = reverse };
     for ($i=0; $i<length($ARGV[0]); $i++) {
@@ -44,8 +56,17 @@ q{if (!defined($COMMON_SUFFIX)) {
 s/\Q$COMMON_SUFFIX\E$/$EXT/;},
 
 
-    'pinyin' => "# Rename Chinese characters in filename into their pinyin\n".
+
+    'pinyin' => "### Summary: Rename Chinese characters in filename into their pinyin\n".
+                "### Requires: Lingua::Han::Pinyin\n".
 q{use Lingua::Han::PinYin; $h||=Lingua::Han::PinYin->new; $_=$h->han2pinyin($_)},
+
+
+
+    'unaccent' => "### Summary: Remove accents in filename, e.g. accéder.txt -> acceder.txt\n".
+                "### Requires: Text::Unaccent::PurePerl\n".
+q{use Text::Unaccent::PurePerl; $_ = unac_string("UTF8", $_)},
+
 
 
 );
@@ -61,7 +82,7 @@ App::perlmv::scriptlets::std
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 AUTHOR
 
