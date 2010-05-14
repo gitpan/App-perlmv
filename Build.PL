@@ -16,7 +16,7 @@ my %module_build_args = (
     'Steven Haryanto <stevenharyanto@gmail.com>'
   ],
   'dist_name' => 'App-perlmv',
-  'dist_version' => '0.26',
+  'dist_version' => '0.27',
   'license' => 'perl',
   'module_name' => 'App::perlmv',
   'recommends' => {},

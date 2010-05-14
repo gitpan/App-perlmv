@@ -7,7 +7,7 @@ use File::Spec;
 use Getopt::Std;
 use Cwd qw(abs_path getcwd);
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 our $HOMEDIR;
 if ($ENV{TESTING_HOME}) { $HOMEDIR = $ENV{TESTING_HOME} }
@@ -291,7 +291,7 @@ perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-0.26
+0.27
 
 =head1 SYNOPSIS
 
@@ -302,10 +302,10 @@ Usage:
  perlmv [options] <scriptlet> <file...>
  perlmv [options] -e <code> <file...>
 
- perlmv -e <code> -W <name>
- perlmv -L
- perlmv -S <name>
- perlmv -D <name>
+ perlmv -e <code> -w <name>
+ perlmv -l
+ perlmv -s <name>
+ perlmv -d <name>
 
 =head2 Usage examples
 
@@ -333,18 +333,18 @@ Really rename the files this time:
 
 Save Perl code as scriptlet (in ~/.perlmv/scriptlets/):
 
- $ perlmv -e 's/\d+//g' -W remove-digits
+ $ perlmv -e 's/\d+//g' -w remove-digits
 
 List all scriptlets (add B<-v> to also show their contents):
 
- $ perlmv -L
+ $ perlmv -l
  lc
  uc
  remove-digits
 
 Show source code of scriptlet:
 
- $ perlmv -S remove-digits
+ $ perlmv -s remove-digits
  s/\d+//g
 
 Remove scriptlet:
@@ -404,8 +404,6 @@ conflicts, recursive mode, and saving and loading scriptlets.
 =item * Patches for Windows welcome.
 
 =item * Scriptlet should be able to receive arguments.
-
-=item * Option to
 
 =back
 

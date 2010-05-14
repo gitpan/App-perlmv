@@ -17,4 +17,4 @@ requires: {}
 resources:
   homepage: http://search.cpan.org/dist/App-perlmv/
   repository: http://github.com/sharyanto/perlmv
-version: 0.26
+version: 0.27
