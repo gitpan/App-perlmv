@@ -1,5 +1,15 @@
 Revision history for App-perlmv
 
+0.28     2010-05-15
+
+         Rename option: -r (recursive) -> -R
+
+         Add option: -r (reverse order)
+
+         $_ will be set to the result of code, if defined (so we can
+         just say -e 'lc' instead of -e '$_=lc')
+
+
 0.27     2010-05-14
 
          Adjust test to account for case-insensitive filesystems.

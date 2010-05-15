@@ -2,25 +2,13 @@
 
 use strict;
 use warnings;
-use File::Find;
-use File::Spec;
+use App::perlmv;
 use Getopt::Std;
-use Cwd qw(abs_path getcwd);
 
-our $VERSION = 0.27;
-
-our $HOMEDIR;
-if ($ENV{TESTING_HOME}) { $HOMEDIR = $ENV{TESTING_HOME} }
-else {
-    eval { require File::HomeDir; $HOMEDIR = File::HomeDir->my_home };
-    if (!$HOMEDIR) { $HOMEDIR = $ENV{HOME} }
-    die "FATAL: Can't determine home directory\n" unless $HOMEDIR;
-}
-
-my $scriptlets;
+our $VERSION = $App::Perlmv::VERSION;
 
 my %opts;
-getopts('ce:D:dfhlorSs:Vvw:', \%opts);
+getopts('ce:D:dfhloRrSs:Vvw:', \%opts);
 
 if ($opts{V}) { print "perlmv version $VERSION\n"; exit 0 }
 if ($opts{h}) { print <<'USAGE'; exit 0 }
@@ -47,7 +35,8 @@ Options:
  -h  Show this help
  -o  Overwrite (by default, ".1", ".2", and so on will be appended to
      avoid overwriting existing files)
- -r  Recursive
+ -R  Recursive
+ -r  reverse order of processing (by default order is asciibetically)
  -S  Do not process symlinks
  -V  Print version and exit
  -v  Verbose
@@ -58,11 +47,20 @@ Options:
  -D <NAME> Delete scriptlet
 USAGE
 
+my $pmv = App::perlmv->new;
+$pmv->{dry_run} = $opts{d};
+$pmv->{verbose} = $opts{v} || $opts{d};
+$pmv->{reverse_order} = $opts{r};
+$pmv->{recursive} = $opts{R};
+$pmv->{process_symlink} = !$opts{S};
+$pmv->{process_dir} = !$opts{f};
+$pmv->{overwrite} = $opts{o};
+
 if ($opts{l}) {
-    load_scriptlets();
-    for (sort keys %$scriptlets) {
+    $pmv->load_scriptlets();
+    for (sort keys %{$pmv->{scriptlets}}) {
         if ($opts{v}) {
-            print format_scriptlet_source($_), "\n";
+            print $pmv->format_scriptlet_source($_), "\n";
         } else {
             print $_, "\n";
         }
@@ -71,35 +69,28 @@ if ($opts{l}) {
 }
 
 if ($opts{s}) {
-    print format_scriptlet_source($opts{s});
+    print $pmv->format_scriptlet_source($opts{s});
     exit 0;
 }
 
 if ($opts{w}) {
-    write_scriptlet($opts{w}, $opts{e});
+    $pmv->store_scriptlet($opts{w}, $opts{e});
     exit 0;
 }
 
 if ($opts{D}) {
-    delete_user_scriptlet($opts{D});
+    $pmv->delete_user_scriptlet($opts{D});
     exit 0;
 }
 
-my ($code, $name);
 if ($opts{e}) {
-    $code = $opts{e};
-    $name = "-e";
+    $pmv->{code} = $opts{e};
 } else {
-    die "FATAL: Must specify -e or scriptlet name in first argument\n"
+    die "FATAL: Must specify code (-e) or scriptlet name (first argument)"
         unless @ARGV;
-    $name = shift @ARGV;
-    $code = load_scriptlet($name);
+    $pmv->{code} = $pmv->load_scriptlet(scalar shift @ARGV);
 }
 
-$opts{v} = 1 if $opts{d};
-
-# test code first
-run_code($code, $name, 1);
 exit 0 if $opts{c};
 
 die "FATAL: Please specify some files in arguments\n" unless @ARGV;
@@ -115,172 +106,7 @@ if ($^O =~ /win32/i) {
     push @items, @ARGV;
 }
 
-my %n = ();
-process_items(@items);
-
-# subroutines
-
-sub format_scriptlet_source {
-    my ($name) = @_;
-    load_scriptlets();
-    die "FATAL: Scriptlet `$name` not found\n"
-        unless $scriptlets->{$name};
-    "### Name: $name (from ", $scriptlets->{$name}{from}, ")\n" .
-    $scriptlets->{$name}{code} .
-    ($scriptlets->{$name}{code} =~ /\n\z/ ? "" : "\n");
-}
-
-sub load_scriptlet {
-    my ($name) = @_;
-    load_scriptlets();
-    die "FATAL: Can't find scriptlet `$name`"
-        unless $scriptlets->{$name};
-    $scriptlets->{$name}{code};
-}
-
-sub load_scriptlets {
-    if (!$scriptlets) {
-        $scriptlets = find_scriptlets();
-    }
-}
-
-sub find_scriptlets {
-    my $res = {};
-
-    eval { require App::perlmv::scriptlets::std };
-    if (%App::perlmv::scriptlets::std::scriptlets) {
-        $res->{$_} = { code=>$App::perlmv::scriptlets::std::scriptlets{$_},
-                       from=>"App::perlmv::scriptlets::std.pm" }
-            for keys %App::perlmv::scriptlets::std::scriptlets;
-    }
-
-    eval { require App::perlmv::scriptlets };
-    if (%App::perlmv::scriptlets::scriptlets) {
-        $res->{$_} = { code=>$App::perlmv::scriptlets::scriptlets{$_},
-                       from=>"App::perlmv::scriptlets.pm" }
-            for keys %App::perlmv::scriptlets::scriptlets;
-    }
-
-    if (-d "/usr/share/perlmv/scriptlets") {
-        local $/;
-        for (glob "/usr/share/perlmv/scriptlets/*") {
-            my $name = $_; $name =~ s!.+/!!;
-            open my($fh), $_;
-            my $code = <$fh>;
-            $res->{$name} = { code=>$code, from => $_ }
-                if $code;
-        }
-    }
-
-    if (-d "$HOMEDIR/.perlmv/scriptlets") {
-        local $/;
-        for (glob "$HOMEDIR/.perlmv/scriptlets/*") {
-            my $name = $_; $name =~ s!.+/!!;
-            open my($fh), $_;
-            my $code = <$fh>;
-            $res->{$name} = { code=>$code, from => $_ }
-                if $code;
-        }
-    }
-
-    $res;
-}
-
-sub valid_scriptlet_name {
-    my ($name) = @_;
-    $name =~ m/^[A-Za-z_][0-9A-Za-z_-]*$/;
-}
-
-sub write_scriptlet {
-    my ($name, $code) = @_;
-    die "FATAL: Invalid scriptlet name `$name`\n"
-        unless valid_scriptlet_name($name);
-    die "FATAL: Code not specified\n" unless $code;
-    unless (-d "$HOMEDIR/.perlmv") {
-        mkdir "$HOMEDIR/.perlmv" or
-            die "FATAL: Can't mkdir `$HOMEDIR/.perlmv`: $!\n";
-    }
-    unless (-d "$HOMEDIR/.perlmv/scriptlets") {
-        mkdir "$HOMEDIR/.perlmv/scriptlets" or
-            die "FATAL: Can't mkdir `$HOMEDIR/.perlmv/scriptlets`: $!\n";
-    }
-    # XXX warn existing file, unless -o
-    open my($fh), ">$HOMEDIR/.perlmv/scriptlets/$name";
-    print $fh $code;
-    close $fh or
-        die "FATAL: Can't write to $HOMEDIR/.perlmv/scriptlets/$name: $!\n";
-}
-
-sub delete_user_scriptlet {
-    my ($name) = @_;
-    unlink "$HOMEDIR/.perlmv/scriptlets/$name";
-}
-
-sub run_code {
-    my ($code, $name, $is_testing) = @_;
-    no strict;
-    no warnings;
-    $_ = "-TEST" if $is_testing;
-    $App::perlmv::code::TESTING = ($is_testing ? 1 : undef);
-    eval "package App::perlmv::code; $code";
-    die "FATAL: Code (name=$name, code=$code, \$_=$_) died: $@\n" if $@;
-}
-
-sub process_items {
-    my @items = @_;
-    for my $item (@items) {
-        next if $opts{S} && (-l $item);
-        if (-d _) {
-            next if $opts{f};
-            if ($opts{r}) {
-                my $cwd = getcwd();
-                if (chdir $item) {
-                    print "INFO: chdir `$cwd/$item` ...\n" if $opts{v};
-                    local *D;
-                    opendir D, ".";
-                    my @d = grep { $_ ne '.' && $_ ne '..' } readdir D;
-                    closedir D;
-                    process_items(@d);
-                    chdir $cwd or die "FATAL: Can't go back to `$cwd`: $!\n";
-                } else {
-                    warn "WARN: Can't chdir to `$cwd/$item`, skipped\n";
-                }
-            }
-        }
-        process_item($item);
-    }
-}
-
-sub process_item {
-    my ($filename) = @_;
-    local $_ = $filename;
-
-    my $old = $filename;
-    run_code($code, $name);
-    my $new = $_;
-
-    return if abs_path($old) eq abs_path($new);
-
-    my $cwd = getcwd();
-    unless ($opts{o}) {
-        my $i = 1;
-        while (1) {
-            if ((-e $new) || exists $n{"$cwd/$new"}) {
-                $new = "$_.$i";
-                $i++;
-            } else {
-                last;
-            }
-        }
-        $n{"$cwd/$new"}++;
-    }
-    print "DRYRUN: " if $opts{d};
-    print "`$old` -> `$new`\n" if $opts{v};
-    unless ($opts{d}) {
-        my $res = rename $old, $new;
-        warn "ERROR: failed renaming $old -> $new\n" unless $res;
-    }
-}
+$pmv->rename(@items);
 
 1;
 __END__
@@ -288,10 +114,6 @@ __END__
 =head1 NAME
 
 perlmv - Rename files using Perl code
-
-=head1 VERSION
-
-0.27
 
 =head1 SYNOPSIS
 
@@ -378,7 +200,8 @@ L<App::perlmv::scriptlets::std>.
  -h  Show this help
  -o  Overwrite (by default, ".1", ".2", and so on will be appended to
      avoid overwriting existing files)
- -r  Recursive
+ -R  Recursive
+ -r  Reverse order of processing (by default order is asciibetically)
  -S  Do not process symlinks
  -V  Print version and exit
  -v  Verbose
@@ -390,12 +213,31 @@ L<App::perlmv::scriptlets::std>.
 
 =head1 FAQ
 
-=head2 Why should I use perlmv? There is prename already?
+=head2 Why should I use perlmv? There is prename (File::Rename) already?
 
 Yes, there is a very similar script called B<prename> (also accessible
 via B<rename> in Debian) which comes with Perl. This script reinvents
 prename and offers more features, e.g.: automatic renaming in case of
 conflicts, recursive mode, and saving and loading scriptlets.
+
+=head2 And there is also pmv (File::PerlMove)!
+
+Okay, you got me. I didn't do my homework. The "rename files using
+Perl code/expression" is pretty obvious and has surely come up on
+other CPAN authors' minds. To be honest, this is a script which I
+wrote years ago (at least in 2003, or earlier) and have been using for
+years, personally. Admittedly I uploaded this script to CPAN without
+careful checking of existing solutions on CPAN. But then, lots of
+other CPAN modules are also overlapping in functionality with one
+another.
+
+Anyway, I plan to improve perlmv as I see fit, mainly for my own
+needs. I plan to borrow some features from prename/pmv, and welcome
+them borrowing features from perlmv. I welcome patches. And I am
+willing to submit patches to prename/pmv after some discussions with
+the respective authors. And lastly, I am also open to the idea of
+merging perlmv to either pername/pmv, if I can get all the features I
+love in perlmv into those projects.
 
 =head1 BUGS/TODOS
 
@@ -409,6 +251,8 @@ conflicts, recursive mode, and saving and loading scriptlets.
 
 =head1 SEE ALSO
 
-L<prename>.
+L<prename> (L<File::Rename>)
+
+L<pm> (L<File::PerlMove>)
 
 =cut

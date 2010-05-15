@@ -1,17 +1,9 @@
 package App::perlmv::scriptlets::std;
 BEGIN {
-  $App::perlmv::scriptlets::std::VERSION = '0.27';
+  $App::perlmv::scriptlets::std::VERSION = '0.28';
 }
 
 our %scriptlets = (
-
-
-
-    'lc' => "### Summary: Convert filenames to lowercase\n" . q[$_ = lc],
-
-
-
-    'uc' => "### Summary: Convert filenames to uppercase\n" . q[$_ = uc],
 
 
 
@@ -19,14 +11,14 @@ our %scriptlets = (
 q{$i||=0; $i++ unless $TESTING;
 /.+\.(.+)/; $ext=$1;
 $ndig = @ARGV >= 1000 ? 4 : @ARGV >= 100 ? 3 : @ARGV >= 10 ? 2 : 1;
-$_ = sprintf "%0${ndig}d%s", $i, (defined($ext) ? ".$ext" : "")},
+sprintf "%0${ndig}d%s", $i, (defined($ext) ? ".$ext" : "")},
 
 
 
     'to-timestamp-ext' => "### Summary: Rename files into timestamp. Preserve extensions. Ex: file1.txt -> 2010-05-13-10_43_49.txt\n".
 q{use POSIX; /.+\.(.+)/; $ext=$1;
 @st = lstat $_;
-$_ = POSIX::strftime("%Y-%m-%d-%H_%M_%S", localtime $st[9]).(defined($ext) ? ".$ext" : "")},
+POSIX::strftime("%Y-%m-%d-%H_%M_%S", localtime $st[9]).(defined($ext) ? ".$ext" : "")},
 
 
 
@@ -59,13 +51,13 @@ s/\Q$COMMON_SUFFIX\E$/$EXT/;},
 
     'pinyin' => "### Summary: Rename Chinese characters in filename into their pinyin\n".
                 "### Requires: Lingua::Han::Pinyin\n".
-q{use Lingua::Han::PinYin; $h||=Lingua::Han::PinYin->new; $_=$h->han2pinyin($_)},
+q{use Lingua::Han::PinYin; $h||=Lingua::Han::PinYin->new; $h->han2pinyin($_)},
 
 
 
     'unaccent' => "### Summary: Remove accents in filename, e.g. accéder.txt -> acceder.txt\n".
                 "### Requires: Text::Unaccent::PurePerl\n".
-q{use Text::Unaccent::PurePerl; $_ = unac_string("UTF8", $_)},
+q{use Text::Unaccent::PurePerl; unac_string("UTF8", $_)},
 
 
 
@@ -82,7 +74,7 @@ App::perlmv::scriptlets::std
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 AUTHOR
 
