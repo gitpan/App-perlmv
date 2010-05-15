@@ -2,7 +2,7 @@ NAME
     App::perlmv - Rename files using Perl code.
 
 VERSION
-    version 0.28
+    version 0.29
 
 AUTHOR
       Steven Haryanto <stevenharyanto@gmail.com>
