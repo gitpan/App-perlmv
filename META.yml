@@ -15,7 +15,8 @@ name: App-perlmv
 recommends: {}
 requires:
   File::Path: 2.07
+  perl: 5.010
 resources:
   homepage: http://search.cpan.org/dist/App-perlmv/
   repository: http://github.com/sharyanto/perl-App-perlmv
-version: 0.30
+version: 0.31

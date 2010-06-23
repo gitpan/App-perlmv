@@ -11,11 +11,12 @@ dist.ini
 lib/App/perlmv.pm
 lib/App/perlmv/scriptlets/std.pm
 t/00-compile.t
-t/basics.t
 t/cp.t
 t/ln.t
 t/ln_s.t
-t/order.t
+t/mv.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+t/scriptlets.t
 t/testlib.pl
+t/todo.txt

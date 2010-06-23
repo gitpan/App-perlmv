@@ -1,6 +1,6 @@
 package App::perlmv::scriptlets::std;
 BEGIN {
-  $App::perlmv::scriptlets::std::VERSION = '0.30';
+  $App::perlmv::scriptlets::std::VERSION = '0.31';
 }
 
 our %scriptlets = (
@@ -9,7 +9,7 @@ our %scriptlets = (
 
     'to-number-ext' => "### Summary: Rename files into numbers. Preserve extensions. Ex: (file1.txt, foo.jpg, quux.mpg) -> (1.txt, 2.jpg, 3.mpg)\n".
 q{$i||=0; $i++ unless $TESTING;
-/.+\.(.+)/; $ext=$1;
+if (/.+\.(.+)/) {$ext=$1} else {$ext=undef}
 $ndig = @ARGV >= 1000 ? 4 : @ARGV >= 100 ? 3 : @ARGV >= 10 ? 2 : 1;
 sprintf "%0${ndig}d%s", $i, (defined($ext) ? ".$ext" : "")},
 
@@ -74,7 +74,7 @@ App::perlmv::scriptlets::std
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 AUTHOR
 

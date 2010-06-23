@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
 use App::perlmv;
 
-App::perlmv::__big_ugly_wrapper();
+App::perlmv->new->run;
 
 1;
