@@ -1,6 +1,6 @@
 package App::perlmv;
 BEGIN {
-  $App::perlmv::VERSION = '0.31';
+  $App::perlmv::VERSION = '0.32';
 }
 # ABSTRACT: Rename files using Perl code.
 
@@ -51,9 +51,6 @@ sub new {
 
 sub parse_opts {
     my $self = shift;
-    # because some platforms don't support ln and ln -s. otherwise i
-    # would just link the 'perlmv' command to 'perlcp', 'perlln',
-    # perlln_s'.
 
     GetOptions(
         'c|check'         => \$self->{ 'check'         },
@@ -96,9 +93,9 @@ sub run {
 
     # -m is reserved for file mode
     my $default_mode =
-        $0 =~ /cp/   ? 'copy'    :
-        $0 =~ /ln_s/ ? 'symlink' :
-        $0 =~ /ln/   ? 'link'    :
+        $0 =~ /perlcp/   ? 'copy'    :
+        $0 =~ /perlln_s/ ? 'symlink' :
+        $0 =~ /perlln/   ? 'link'    :
         'rename';
 
     $self->{'dry_run'} and $self->{'verbose'}++;
@@ -443,7 +440,7 @@ App::perlmv - Rename files using Perl code.
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =for Pod::Coverage .+
 

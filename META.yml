@@ -19,4 +19,4 @@ requires:
 resources:
   homepage: http://search.cpan.org/dist/App-perlmv/
   repository: http://github.com/sharyanto/perl-App-perlmv
-version: 0.31
+version: 0.32
