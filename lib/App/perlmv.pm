@@ -1,6 +1,6 @@
 package App::perlmv;
 BEGIN {
-  $App::perlmv::VERSION = '0.32';
+  $App::perlmv::VERSION = '0.33';
 }
 # ABSTRACT: Rename files using Perl code.
 
@@ -440,7 +440,7 @@ App::perlmv - Rename files using Perl code.
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =for Pod::Coverage .+
 

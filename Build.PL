@@ -16,12 +16,13 @@ my %module_build_args = (
     'Steven Haryanto <stevenharyanto@gmail.com>'
   ],
   'dist_name' => 'App-perlmv',
-  'dist_version' => '0.32',
+  'dist_version' => '0.33',
   'license' => 'perl',
   'module_name' => 'App::perlmv',
   'recommends' => {},
   'requires' => {
     'File::Path' => '2.07',
+    'Test::Exception' => '0',
     'perl' => '5.010'
   },
   'script_files' => [
