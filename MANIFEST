@@ -18,11 +18,13 @@ t/mv.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
 t/scriptlets.t
+t/std_scriptlets-dedup-space.t
 t/std_scriptlets-pinyin.t
 t/std_scriptlets-remove-common-prefix.t
 t/std_scriptlets-remove-common-suffix.t
 t/std_scriptlets-to-number-ext.t
 t/std_scriptlets-to-timestamp-ext.t
+t/std_scriptlets-trim.t
 t/std_scriptlets-unaccent.t
 t/testlib.pl
 t/todo.txt
