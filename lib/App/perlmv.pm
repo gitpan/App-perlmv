@@ -1,6 +1,6 @@
 package App::perlmv;
 BEGIN {
-  $App::perlmv::VERSION = '0.36';
+  $App::perlmv::VERSION = '0.37';
 }
 # ABSTRACT: Rename files using Perl code.
 
@@ -241,6 +241,7 @@ sub find_scriptlets {
             my $name = $_; $name =~ s!.+/!!;
             open my($fh), $_;
             my $code = <$fh>;
+            ($code) = $code =~ /(.*)/s; # untaint
             $res->{$name} = { code => $code, from => $_ }
                 if $code;
         }
@@ -268,12 +269,13 @@ sub store_scriptlet {
         mkdir $path or die "FATAL: Can't mkdir `$path: $!\n";
     }
     $path .= "/$name";
-    unless ((-e $path) && !$self->{'overwrite'}) {
-        mkdir $path or die "FATAL: Can't overwrite `$path (use -o)\n";
+    if ((-e $path) && !$self->{'overwrite'}) {
+        die "FATAL: Can't overwrite `$path (use -o)\n";
+    } else {
+        open my($fh), ">", $path;
+        print $fh $code;
+        close $fh or die "FATAL: Can't write to $path: $!\n";
     }
-    open my($fh), ">", $path;
-    print $fh $code;
-    close $fh or die "FATAL: Can't write to $path: $!\n";
 }
 
 sub delete_user_scriptlet {
@@ -460,7 +462,7 @@ App::perlmv - Rename files using Perl code.
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =for Pod::Coverage .+
 

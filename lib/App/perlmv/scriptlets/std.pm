@@ -1,6 +1,6 @@
 package App::perlmv::scriptlets::std;
 BEGIN {
-  $App::perlmv::scriptlets::std::VERSION = '0.36';
+  $App::perlmv::scriptlets::std::VERSION = '0.37';
 }
 # ABSTRACT: A collection of perlmv scriptlets
 
@@ -94,7 +94,7 @@ App::perlmv::scriptlets::std - A collection of perlmv scriptlets
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SCRIPTLETS
 
