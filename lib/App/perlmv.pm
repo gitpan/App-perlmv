@@ -12,7 +12,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long qw(:config no_ignore_case bundling);
 
-our $VERSION = '0.44'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -553,7 +553,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =for Pod::Coverage ^(.*)$
 

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.44'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 # ABSTRACT: A collection of perlmv scriptlets
 
@@ -132,7 +132,7 @@ App::perlmv::scriptlets::std - A collection of perlmv scriptlets
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SCRIPTLETS
 

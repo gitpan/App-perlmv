@@ -6,7 +6,7 @@ use FindBin '$Bin';
 use lib "$Bin/../lib";
 use App::perlmv;
 
-our $VERSION = '0.44'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 my $pmv = App::perlmv->new;
 $pmv->{ 'mode' } = 'symlink';
@@ -26,15 +26,15 @@ perlln_s - Symlink files using Perl code
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 DESCRIPTION
 
-See L<perlrename> for more documentation.
+See L<perlmv> for more documentation.
 
 =head1 SEE ALSO
 
-L<perlrename>
+L<perlmv>
 
 =head1 AUTHOR
 
