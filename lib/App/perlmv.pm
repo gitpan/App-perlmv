@@ -12,7 +12,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long qw(:config no_ignore_case bundling);
 
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.46'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -543,9 +543,11 @@ sub rename {
 1;
 # ABSTRACT: Module that implements perlmv
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -553,9 +555,25 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-version 0.45
+This document describes version 0.46 of App::perlmv (from Perl distribution App-perlmv), released on 2014-05-15.
 
 =for Pod::Coverage ^(.*)$
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-perlmv>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -563,10 +581,9 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2014 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
