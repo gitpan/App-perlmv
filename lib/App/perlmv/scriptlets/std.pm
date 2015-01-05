@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.47'; # VERSION
 
 # ABSTRACT: A collection of perlmv scriptlets
 
@@ -135,14 +135,16 @@ App::perlmv::scriptlets::std - A collection of perlmv scriptlets
 
 =head1 VERSION
 
-This document describes version 0.46 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2014-05-15.
+This document describes version 0.47 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2015-01-05.
 
 =head1 SCRIPTLETS
+
 
 =head2 dedup-space
 
 Replace multiple spaces into a single space, example (<space>
 signifies actual space): "1<space><space>2.txt " -> "1<space>2.txt"
+
 
 =head2 keep-one-ext
 
@@ -150,58 +152,70 @@ Remove all but the last file extension if there are more than one, e.g. (1.tar,
 2.mp3.mp3) -> (1.tar, 2.mp3). TODO: treat tar.gz/tar.bz2/etc as one
 extension.
 
+
 =head2 pinyin
 
 Rename Chinese characters in filename into their pinyin. Requires
 L<Lingua::Han::Pinyin>.
+
 
 =head2 remove-common-prefix
 
 Remove prefix that are common to all args, e.g. (file1, file2b) -> (1,
 2b)
 
+
 =head2 remove-common-suffix
 
 Remove suffix that are common to all args, while preserving extension,
 e.g. (1-radiolab.mp3, 2-radiolab.mp3) -> (1.mp3, 2.mp3)
 
+
 =head2 remove-ext
 
 Remove the last file extension, e.g. (1, 2.mp3, 3.tar.gz) -> (1, 2, 3.tar)
 
+
 =head2 remove-all-ext
 
 Remove all file extensions, e.g. (file.html.gz) -> (file)
+
 
 =head2 to-number
 
 Rename files into numbers. Ex: (file1.txt, foo.jpg, quux.mpg) -> (1.txt, 2.jpg,
 3.mpg). See also: to-number-ext.
 
+
 =head2 to-number-ext
 
 Rename files into numbers. Preserve extensions. Ex: (file1.txt,
 foo.jpg, quux.mpg) -> (1.txt, 2.jpg, 3.mpg)
+
 
 =head2 to-timestamp
 
 Rename files into timestamp. Ex: file1.txt -> 2010-05-13-10_43_49. See also:
 to-timestamp-ext.
 
+
 =head2 to-timestamp-ext
 
 Rename files into timestamp. Preserve extensions. Ex: file1.txt ->
 2010-05-13-10_43_49.txt
+
 
 =head2 trim
 
 Remove leading and trailing blanks, example: " abc def .txt " -> "abc
 def.txt"
 
+
 =head2 unaccent
 
 Remove accents in filename, e.g. accéder.txt -> acceder.txt. Requires
 L<Text::Unaccent::PurePerl>.
+
 
 =head2 HAVE MORE?
 
@@ -226,11 +240,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

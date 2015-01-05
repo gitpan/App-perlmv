@@ -1,5 +1,7 @@
 package App::perlmv;
-# ABSTRACT: Rename files using Perl code
+
+our $DATE = '2015-01-05'; # DATE
+our $VERSION = '0.47'; # VERSION
 
 use 5.010;
 use strict;
@@ -8,11 +10,10 @@ use Cwd qw(abs_path getcwd);
 #use Data::Dump qw(dump);
 use File::Copy;
 use File::Find;
+use File::MoreUtil qw(l_abs_path);
 use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long qw(:config no_ignore_case bundling);
-
-our $VERSION = '0.46'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -401,12 +402,12 @@ sub process_item {
     local $_ = $item->{name_for_script};
 
     my $old = $item->{real_name};
-    my $aold = abs_path($old);
-    #die "Invalid path $old" unless defined($aold);
-    $aold = "" if !defined($aold);
+    my $aold = l_abs_path($old);
+    die "Invalid path $old" unless defined($aold);
     my ($oldvol,$olddir,$oldfile)=File::Spec->splitpath($aold);
     my ($olddirvol,$olddirdir,$olddirfile) = File::Spec->splitpath(
-        abs_path($olddir));
+        l_abs_path($olddir));
+    my $aolddir = File::Spec->catpath($olddirvol, $olddirdir, '');
     local $App::perlmv::code::DIR    = $olddir;
     local $App::perlmv::code::FILE   = $oldfile;
     local $App::perlmv::code::PARENT = $olddirfile;
@@ -414,9 +415,9 @@ sub process_item {
     $self->run_code($code);
 
     my $new = $_;
-    my $anew = abs_path($new);
-    #die "Invalid path $new" unless defined($anew);
-    $anew = "" if !defined($anew);
+    # we use rel2abs instead of l_abs_path because path might not exist (yet)
+    # and we don't want to check for actual existence
+    my $anew = File::Spec->rel2abs($new);
 
     $self->{_exists}{$aold}++ if (-e $aold);
     return if $aold eq $anew;
@@ -449,7 +450,7 @@ sub process_item {
         while (1) {
             if ((-e $new) || exists $self->{_exists}{$anew}) {
                 $new = "$orig_new.$i";
-                $anew = abs_path($new);
+                $anew = l_abs_path($new);
                 $i++;
             } else {
                 last;
@@ -541,7 +542,7 @@ sub rename {
 }
 
 1;
-# ABSTRACT: Module that implements perlmv
+# ABSTRACT: Rename files using Perl code
 
 __END__
 
@@ -555,7 +556,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.46 of App::perlmv (from Perl distribution App-perlmv), released on 2014-05-15.
+This document describes version 0.47 of App::perlmv (from Perl distribution App-perlmv), released on 2015-01-05.
 
 =for Pod::Coverage ^(.*)$
 
@@ -577,11 +578,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
