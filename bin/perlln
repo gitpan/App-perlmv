@@ -6,7 +6,7 @@ use FindBin '$Bin';
 use lib "$Bin/../lib";
 use App::perlmv;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 my $pmv = App::perlmv->new;
 $pmv->{ 'mode' } = 'link';
@@ -28,7 +28,7 @@ perlln - Link files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.47 of perlln (from Perl distribution App-perlmv), released on 2015-01-05.
+This document describes version 0.48 of perlln (from Perl distribution App-perlmv), released on 2015-01-07.
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-perlmv>.
+Source repository is at L<https://github.com/perlancar/perl-App-perlmv>.
 
 =head1 BUGS
 

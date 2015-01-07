@@ -1,7 +1,7 @@
 package App::perlmv;
 
-our $DATE = '2015-01-05'; # DATE
-our $VERSION = '0.47'; # VERSION
+our $DATE = '2015-01-07'; # DATE
+our $VERSION = '0.48'; # VERSION
 
 use 5.010;
 use strict;
@@ -556,7 +556,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.47 of App::perlmv (from Perl distribution App-perlmv), released on 2015-01-05.
+This document describes version 0.48 of App::perlmv (from Perl distribution App-perlmv), released on 2015-01-07.
 
 =for Pod::Coverage ^(.*)$
 
@@ -566,7 +566,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-perlmv>.
+Source repository is at L<https://github.com/perlancar/perl-App-perlmv>.
 
 =head1 BUGS
 
